@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>deep-learning on sanket.tech</title>
+    <link>https://sanket.tech/tags/deep-learning/</link>
+    <description>Recent content in deep-learning on sanket.tech</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Sanket Shanbhag</copyright>
+    <lastBuildDate>Sun, 02 Feb 2020 16:35:47 +0530</lastBuildDate><atom:link href="https://sanket.tech/tags/deep-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hardware Bottlenecks and Neural Networks</title>
+      <link>https://sanket.tech/posts/bottlenecks-nn/</link>
+      <pubDate>Sun, 02 Feb 2020 16:35:47 +0530</pubDate>
+      
+      <guid>https://sanket.tech/posts/bottlenecks-nn/</guid>
+      <description>Training deep neural networks takes a long time.</description>
+    </item>
+    
+  </channel>
+</rss>

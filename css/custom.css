@@ -1,0 +1,13 @@
+#header #logo {
+    filter:initial;
+    -webkit-filter:initial;
+}
+body {
+    font-size:15px;
+    line-height:1.53;
+}
+figcaption > p {
+    text-align:center;
+}
+
+

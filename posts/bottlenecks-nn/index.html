@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Hardware Bottlenecks and Neural Networks | sanket.tech</title>
+  <meta name="description" content="All information looks like noise until you break the code.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Hardware Bottlenecks and Neural Networks" />
+<meta property="og:description" content="Training deep neural networks takes a long time." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sanket.tech/posts/bottlenecks-nn/" />
+<meta property="article:published_time" content="2020-02-02T16:35:47+05:30" />
+<meta property="article:modified_time" content="2020-02-02T16:35:47+05:30" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hardware Bottlenecks and Neural Networks"/>
+<meta name="twitter:description" content="Training deep neural networks takes a long time."/>
+
+  
+  
+    
+  
+  
+  <link rel="stylesheet" href="https://sanket.tech/css/style-light.css">
+  
+   <link rel="stylesheet" href="https://sanket.tech/css/custom.css"> 
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://sanket.tech/img/favicon.ico" />
+
+  
+  
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://sanket.tech/about/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&text=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&is_video=false&description=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Hardware%20Bottlenecks%20and%20Neural%20Networks&body=Check out this article: https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&name=Hardware%20Bottlenecks%20and%20Neural%20Networks&description=Training%20deep%20neural%20networks%20takes%20a%20long%20time.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&t=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-data-pipeline">The data pipeline</a></li>
+    <li><a href="#the-tools-of-the-trade">The tools of the trade</a></li>
+    <li><a href="#finding-bottlenecks">Finding bottlenecks</a></li>
+    <li><a href="#solving-bottlenecks">Solving bottlenecks</a>
+      <ul>
+        <li><a href="#cpu-bottlenecks">CPU bottlenecks</a></li>
+        <li><a href="#storage-bottlenecks">Storage bottlenecks</a></li>
+        <li><a href="#gpu-bottlenecks">GPU bottlenecks</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Hardware Bottlenecks and Neural Networks
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2020-02-02 16:35:47 &#43;0530 IST" itemprop="datePublished">Feb 2 2020</time>
+          
+        </div>
+        
+        
+        <div class="article-tag">
+            <i class="fas fa-tag"></i>
+            
+            
+            <a class="tag-link" href="/tags/deep-learning" rel="tag">deep-learning</a>
+            
+             ,  
+            <a class="tag-link" href="/tags/optimization" rel="tag">optimization</a>
+            
+             ,  
+            <a class="tag-link" href="/tags/pytorch" rel="tag">pytorch</a>
+            
+             ,  
+            <a class="tag-link" href="/tags/tensorflow" rel="tag">tensorflow</a>
+            
+        </div>
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>Training deep neural networks takes a long time. Since data science is largely a game of hyperparameter tuning, ensuring your
+networks train as fast as possible allows you to carry out more experiments and iterate quicker. Once your model and data
+pipeline is ready, making sure your CPU and storage don&rsquo;t bottleneck the training process are important to ensure efficiency.</p>
+<h2 id="the-data-pipeline">The data pipeline</h2>
+<div class="mxgraph" style="max-width:100%;border:1px solid transparent;" data-mxgraph="{&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;resize&quot;:true,&quot;toolbar&quot;:&quot;zoom layers lightbox&quot;,&quot;edit&quot;:&quot;_blank&quot;,&quot;xml&quot;:&quot;&lt;mxfile host=\&quot;www.draw.io\&quot; modified=\&quot;2020-02-02T05:09:39.937Z\&quot; agent=\&quot;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0\&quot; etag=\&quot;iLZD_5yeSZAktY26_viz\&quot; version=\&quot;12.6.2\&quot; type=\&quot;device\&quot;&gt;&lt;diagram id=\&quot;aasO5GnlRK7hZWrYiIJR\&quot; name=\&quot;Page-1\&quot;&gt;5X3bcuLGFujX5HHvEhLk8qgxjIcpC8IA44iXUww4MsI2UzYekL7+rGv3aiE89iQ7Z9c+qUoiC6nVvXr1ul9+Si7uj5ePy6+32W59c/dTHK2PPyX9n+L4159/hf/ijYpvdH/7hW8Uj5s13+r4G9NNfSM3I7n7vFnfPAUP7ne7u/3ma3hztXt4uFntg3vLx8fdIXzsz91d+NWvy+Lm5MZ0tbw7vXu9We9vZVm9yN//cLMpbvXLnUh+uV/qw3Lj6Xa53h3MrWTwU3LxuNvt+er+eHFzh7BTuPB778/86ib2ePOwf80LH4vtY9q/+Nfvf/4+fnf3fybXd1fzf8U8yrfl3bMsWCa7rxQCMO+veLm5J1C9+3bzuN8AgK6WX27uft89bfab3QP8/mW33+/u4YE7/OHdcrUtHnfPD+uL3d3ukYZK/qR/zBjp3abAd/e7r3B3+fSVt/DPzfEGZv2OPpnq3UjvwPV6uV/+lKT8Z/z+6VvxU/zueA/rvfj9wyheVO92i+u7h+WHyW/Dcn7M/ngXDTfv4uX152Ry/1v39+nwOLyIovFF2slmg+fxbNsb9uG56bBYx3fb9WVh3+t+uT4+r+pos/zwKVr1d9+uknWyrnpJVvW+re5X37IyPWQXv9Xr+9Xm9/J4yP/4tBtewrfvo2pUDnH8KpsV3WE/i0abbjSe5Yfx7FOc1enzqL+CZ+ZxXqfFaAq/9Sf1qJ7vRxfdaNTH97bFeNrtZfWqczXbwlhZPZpto2GfrpPRdbEf9fPnrB4esnpQrzdRlMG72Sw9jmaLn7/M0iK7GBaL+7unL/1oM4wX93m96mbV8FtzrhmMM6qzblYWx8Zcd6MZfKOc1+NZmqzLQfeqXMXj2bzO8Pvmt5v76DDsp5vh5eLrl8vDb8PN6H5x/347us42V3X319Xl+2h58W77+/QjzDuDcYb1uD/sZtO0xnXAmuOsv43W5eRwVU6OWX/QGd0X+2w27ME3E5hflMXZ3sMqh/VF8NvWw22WHWE++wbcktEf+d7CvH2uWTLun841K7cw13mV1ZMa8CaY67I/qOFbSTabdEf9UQx7DXDMeziP5UV0zOot/D2g+b4FPlk5rK7K7DDuz3ujiyZ8MoRPkpU5wCeDMefwWxHxeidwDXszG3YcnkwdjBw+0dymXYJFVn4ur2Y0hux/auDnx3OwdON9jq9mZi4PX/fZRXqAc3O/vD4+wVkr89mqt7gcdIcbYAfvfv/w7hZOWLEAbPwyG/RgBsdRueqNym0B0I1hJLhOe6PLosbfsjoHyN41oWp/O8XyelvBLvayzQmWI3Y8j/tpl0/RG08kY1bzRAI0UoXG7mo2OAJWx3AqKthVg6nzvxNTb0f13TafFS2nCrEG4VLgvBqYmsHcBjXA+zj+Iz+OL7oJwL2T1e9h3va3010cz+CUAlzbdnF+gNUgrsEZKQ7wxe74Qw60a/U8gh3GVSI0s003HvXTGFcMu3cYAb0Y9wcI5SOcjy5CBZ7pMe3Ki1HVRZoGUDzAWZg8w32C0rA/jGCmh2wGeHuf4Vi4mwxhf40QRpqE3yv8uKs9jTvDVQ/M/TVCIIHf6qyP8/oIeD3swtxiokHlaAffTvA8Zn2gn/cZQhmwbHsYbVI6fxlgEc5p2B88Z32ASY3naAXXDAOYN+wuz/uLrEGwp4K5HuU75Zn1FAFscG192uXiBGblCnb9UwvtHyTj60+344uTU9HJ+nDGAYsBI7q8/vcAtwGsl8+97h/wmW42y3j/+kM6tbR/iO3TCGCy5XVsUng3ZXp56favA7jR4/3jvcyrCLCuiGn/qxSvE9rnKoJn4AT3cdyUxiXc2URuXHje30ceUQLcyxTnC6d3+DwCHgL8F/Yj5TkylQnnTvACnlIXgnv4zscnnu+gRloIeODnW4O8APSYTyte0x50zd4mSC/hpOC3O+F9xIVhjXwP+LScD6QAn0ugDIhP9D1YI8ABZBPEs03UATxhHNwY+FYMB+aHCt+W+TJ8O0KzHazHFwTfrnzvZFzmc+Z+XFTIK7I+zndRelwYAo6lOMcOrxdxf1IBRe0x7tN6EwsHxf3RbBKPGff5HFxnZ3AhtXhFeEH8aJqe4BvBI3kb9RriqSeeA1hQoBSFX6aTDdRlRCvFXd4i/QZowYms8eROEGM6gg173k06BTCTIUkqI8B8oOHAt4gf1IAZ8BvTdKRcsHKWomZ6PYgA45FCwUrwFMM3ZilADrG16BIGgRQEuxMB9uHpRM4NlCpPkG/CCeiOL4Ebg0QGdIQgiZAfzQraOXinMlClecpOH+GbsIM5fH/xZOZcNeYM0GcezCc05xOzSY8gdcL3t/G4X8j86VQVAhek/InMn07Asu/nDDJTjNhPvGeK1NTPEyQfuJ536WTDd3ieiGl+rC99M8cqjeAZlkbKj6WH8bAw8C48jLPCwljGJbjAPAjGREkeYA0VygrD47h/Cyc2jc2J9XOcpgGOeFisCocj1yFeDPvn8ELnjHixsriQmHk6XKB5blKPfx9+jI8POrCbcALmqEPESFcE056AtqCUILuOmL5liFxEXXjnqBiM0kvWJ6yrgNbVuGtf+sXBvFtneO7p9KxbJLj17eh+noynZ3kVyAz4jW2CULtC2jJVnoiS5Fz5bgW6BNDpLUlbX/ptzzGNOpWygP+UBcgQw1PZvF6hFCk8nuSELo95B7sAkpvQX5BUK1gnYHYGssL778jYdBp67TI26kOErUgnD+E4be+mTtLUb7RIkWV+nR8X95NTKbKE9c0mxFthfQmsAddF+AB7/Ex8+drpHTiPyqyh29Q7AM54ko2UjFKq4MID4Avsn/4Geg/wMubree30GuLjvJYM+NmkONWR+f759WbxAnBw0c9P14t8fZajpA5aQQ78jHn8usxhXvlBdW2gKqhrRwhr4K3w3KQr+uvB7BtQxgmfC693uX0QHZ0oDKwXeb8dp+3dU42jRULP4/f32fVi23ayt7WXItJ4RHI/negdSQ7E1T/D30UHV0uSdVzszW9v0bFQeoBZKnZmHToBs3k0Ku9QPwI6DtRllncZswdHljpRSvm0Y22ZJJNKdp80Crf7xGNWp7sv9x2UgUfAiYmIv7RIBCPQuvN4cduqlR5ghkrLCpAPgebh7AvEgSNoZ0fURlWLRD26bT+y/rttdg9yUMsXVijFiCSWIm0HjEcKMagUq+ikbxxWkdXHnrDwvtUbVz3UP4HXHFkW8JYBoRSo+VQt1iQ7ltwfdHCeJOkRXx4CxWdZAnkxQMnpxBlSjD5ZoarguYccqdYz71XRJU0C5gQylUiryOt5TqQJVd2uSPH782O2YT/oTvcgGbRAGzjh1Mx0NohVXoW9M1x9DfR5qJJTD+kz6w2oE2QF6w056alez5oY/WvxFEhLgSQyKkVfqPlU+Gv8puqFuEOqO4T3SZYmmgE0KZD2SMJzcyb5G09CR3RSxOHK6p5mrOglyYl0T+Jbg0APPdGrWUdz8jdLbLyGhpRXhVKem199NbPz9vNjGKQke4jEVDG/DyQm0hsYSyN/vbH6wak+Kff9vD/kxPcMpu4zJ/0X+2D/HV4Mrc3C4MXI4QLBE75/DhfC6/b9F93RwITvv4XHgTSOlqkjUgPcI6Q6IpmTtQt+h2+T/tUTa9BRKBToaV3WR1FTKYFCs+0GJNccqA3bOrIk+K2SMSqW4iMzxjAYg+BM31ad2X8b9FF+DyRctHWE49O3j0TpPmR2jqjFAW4NYY+34Ryr1Ix328LVQOYt78rFqdwJeIu8n6nUKexAFkWuibat0stjgOOoJYmuG3VQms/6yEu2xQipeck2kVUV/BaMART8zBh3KDugHH1k2Qx51Zn3QEe345tvd1e1HZ/08UjsvcEcg7W0aBYvcdQMNQC2lpVDmGXq9RWyXg/QIiDWNLJKC7UG6lrOVX+FHUee7vQs2AnUv5E/wCnEkwO6DVILpNzmvSPbZIXHgK7m3xvY56pVbZ6bBs8V4XhmHtfZkax3ZQHUZYXWkPA9ON3eGn9u/u9brHWj20X5/n5xaq1ryFd5pJ6REWphlc4lL0A+czAReYi9LU5yZ0pntQ+WBUjyT1gWUH3T30f7O3k86qJiS2kgw73F6wQn1Ev7wVouXy9pLe4Xt4v+51beD+cetHHlV2Oyhq+Eh1g7VCR2qBVo5AugzwC5cot2rK657iEdJv7VR1l87myaLMVk1ahPunDHjYv+MdQH6xzpGeoM+M1I7FcHGm+agnSeqY0OTwZaJzqrGr5bz+Xs0XPuN+CrqA+ylHedoa2zy3a2tGCfDtFL55dDucDxTpg/8YDLg9idSbYtWNpnfTqv8ASu8GQh9iaE9fAe0lOgJWifpHsZ8rSZWM7IB1agFIpeFbaglcgHi9jbGtGK041Y5/4UE7+bETyRjpLlQ2gZ2fXV55T1mXe3wLzmU/iypS1D6jNj3s3XZP9Ffh2r7wF5uqO/wGNhZDnt/pun8iLSxznLQuTdSUFyRjsq2S/Ju8Njka00ZpmHx/qC1sRKbapA6QjPUra3V2R7pTmPWZ7i+Yf3E/T08H2ymh0MvafnYA+7YicN3mm5jxa82OHC5cHMDdeAlGRLchzjBt83kjvihFC2SP2dkcG75Mr5SEHLQ15aTtArBfIs2gLEEnkJe1US3hKPH5LmMEj4HM4R548sIyI1Qw8X8cOjWmhHhE+sWZHtZYNngTxceN4BD8mXAfPO2SuH1jmSGUVjunD4vCd8Jk/e4mk8VS9htudrsQJuvNXTX68Ke59xTO7jnns423f2Z94J7qMFUPn2sP/uCc+GeveQQgtFTwB/gKYM+T2iL3ptaNOUcYE9hcF91Oxqjil4HzdkYrJIsqXb4Thq3fDsnH1Q/hwVBvc7ga6xCXUjcyYLf10U/nzacYvizJlqWpVRXhFrcWrn6GgLW5pZ8w5gcHkw8xsGtCWvLT/w1/ZsWz4R3jffA20dcZfX9/lpTHEchehxqCtNyDcFeonQU7LHouUZaU5FugDS+hnRRkP3t3tH44lWiw5y7/xw5K9TPxzAtgOwwrMcM32H8832S9Z56glaWVwMA+orTV7C1iKcs/Ax+BbI2y6eBODR9daYHGMbnM6K53GMfla2gOzZAkDfZK9KXy0TaOVmb7y9T9EAcM5ZGsFzjvOgswN8Eq+HKvUAfQaJwlkz/Hjmm4WMTf4ypPVis6u8Lnj31LI2+UaBtMj4IRHepCdG5IcE3k04U8/Fl418HXn+59rcj1kuIFlgT/z+AmOJkNcQX2f/4VQtYKQHHJEu0V6iTgo8SyMXyMbN8UGok6FFRyw4oNNMu7VaW/weDIlO8drF1mqtMgb2CkOy737IURLuaczQFdl0nb+ccZ2tTzg+yTJw1mu2K5CnROCBe0Nwi9hv/pIcZL7xkB9ZFyIfrkZiMN27ziyOmfXxHsCaI9aZHE54PAB5JrTXpoRH4qckqxTJfdPUjNkyDuLGVGkbRrSkzv6xZL6gsQcly0UObwQ2Dg5dkRsZhhcpyZRk27gwsuTGw4nght/334jZ90HW3R1ZCevP9rudH/7u9OS7qHl01iXuh8DqskB5K6EIGcKLVGWoBl7Mz+FFJfMy58jiBa0nJtij3R7P6ywlu5XK4DTvzcsyOJ1Zh7dDi6+FmRee393Y+YBu2/YWaDxqZahbbN05Jk3V0ZvUWFejFlz6jPaGZ/EmUkyGxWlzRg0Na8PJzzvyJMKZYc0Qz9Ag1jgKsw7FB4H3CT70zuKDwFNk0SY+II/psEy/oMiuDL0EM466snTo5TUxbbL3DQ3E+QT0zdDE4ixNRF9UOXDa8LK/gnVsu0IHcHwfpyN0QPiJ37vqFObi/3L3AT/hLGxZdj7Dl/idqGVcWndAh4EfyNzYy5KhzjkTrw7qTyJ/vAJnArpu6BfzWpBbUPMXzznGOUkkHVpHVhSDmtcOv1kf9fy0lVZ6mkveoJ6L7YqLntrpkY+KzFN7WW4gsntxFM83y63Exwujz9092fgjjY8hPLnPrGzsrzmm5eDpgYuos/cDORl944jjEn+FPNnJn2zjpfl6HZFje8KxSJ7+/POXKdobU6eDAnxjZyHjmDc9Z2ixcvZiiWur+YwOJCZrIBEbOHfHKyuiv33i1YjLR9SlxzOQ5ShmyMXa6d7X5Bvhc1YpfpLcV8N3Rb9HPIT5qsWmRv4MMDlyDPQdrgt+xygG0ulwLzDapkfnMqZ11fKNg/+en4+5V3mcafrGB8/Mqyl+TuFbOXzeKN4NW/nyCHFZvndzH4k+mqoFD/35+mwZfOvCfWPf8t29frfF/4uwV3qBNpjgedkDu+YG/Z50nI8arWPl3P3GerLQdqBtY6SBM1lz1WWdt38bu/vw/ojWRLYe8QAOOqSHkK+JZCo9e3g+lW5RnIP33KWOvsIcDkbmNGtNZY1CzxowE/pn9jlLxk7HuVW4Ec6ynpN2+dq+n56MpbSY49lWbKW9COZfEC1VWfHcWuAMoYdS/Fax6MYiy0ysDNOUFeqGHhAbPSCWM8E0LS6sblPa8+Hxwq49beA5wvZTTNZr0uOKhPwVU5TT0YaBegxZi4lmAH1BXkdRY56WIK9MUe/ufgF4OZsbrIVhVogMSWe90mgCOJeRxlGIbU/l/z3DRnwRBAuj75yVB/3zBC/E9Vnq+fNUdCLme3BGcvWq1+uS+QrbZAmPkbYi3YnY97htwGzSPH+qax69nt1+/gXXmjRLdFh/DbSlg7ZpxjmMQtu6GGfZIxgL12bPxll89teXpIurp7/OK4fLaBcgaz7yRhdVRjHOtH61xCeONmJEAc8LbQZAz5GeUOTGz1/IHqeejXeOd4vdG+nHM9v7skThz3wd4I/eArYdPYtPkGjfSHmZixNLHc0j/CJ/M9qORz9AezPxTgwiouHMj+H7ohe8AeaN86W6Zod8jD/Ax0R/3ltZDXgn8nw+X8nXPcW4oR6BskOJdtJ57fJDLjMHO+8DoPMLvIt9D2d8AMbOlRU28pPsvDxf9QFUoV3J+gBwnyeFsZnGxsYbOVss6S635F8Ruy7KAF0HO/bOia6UAy9CfUfs8962K75NyVb4wPYkjQZFnj1CHsj2WvRcHX0uEa6hYB2B5cVK157RnqhXbWhipcknKmvM2Mcq9m3Aa5jHkPcE5TLymK0kchZtgyzfsY6xUjnzSPIr88E9RjwpDsJzPZg/03z+XuDJRNkaxid7OsvWhcZZwpwLkyOBOVpqj0/Rrn1wHkmOw4vZh+XeiYJ3UJ+w7/jvSOQQ23FZf/Vz4PEIZ+E5Owc73lAzYRjvNmnXysFnvnsMxkM5hfgA0iD2UGL8uNnPPUXh9mkvCtTpNFZfIo403s7s7WRv93bZb+wt8jaGVWH2uWa653ISUOcU31eGewu6JmYooc6hZycy+WKfKOYIvqdxrGivFBs56QQwl4Jot1lDchWOZ9aAPrVg3ohrrOsgjrs1FKQDe97v14D5bYSfpJ+veP5TO+dJgLN6BsjHSmcAzyLTEIo7UjukmT/b3TXKLTp7vsjjS7Qabd/rkn1SK/bcm7MWzj/iPRAfAsw1mC/L9BjfSv7AgnML857EXJ63+1fRM+tLWfdq6m3k3i9K9D0RH/AzR4BnXWsvR7vtCOkg610c6yoR9ehXUJqIMcWOJlapoYmrQmii+NcMHZymxhd2F9uxyX7svgu8c6q5WJQ/Sf4vijjfRM73ZuYtvrtUYrXJ2x9LXNx5v2sz/s3H4Jl8woE/3wLHEemfGjflvrsT/x3BfeRovsLOwgv1eJZ1UV/PgvNtdSMLO+tHvAv2ZV2a716S7BJzRGWxv9KcF+GxHk4rywsRZh2zPpRTNdcI5f3E0b/rQxfWrPHpe/a/E15jzmcX/a2jOqW8W9a7J+yXeyGuQOIbWmyaImN72frEpmm/od8n3c9FYbREzxL3olPQR08djqTaeYGnucOayG0ZSvpkJdw3tSZZycFYIo/Wg9LiKQm+YSza8Y9YMGlXmhbM16++phxesm+ML9+y+rxt9bSKv2n1xPNfZc9/efWc+Q5XPyXvTssSSKUCzPm/OZpbUqbg8mZ3f7N/rOAR+fXnX6VkgtSM6Pz8279/+ZlvHXwRhk4iI9/aAgx6cymFHwo3vK+NABdSHuENpRKS/09KJTyclEo4ELkgsSQ9oAkRyPZm+GH9dfHh0w5+h78/HtYXw+LmsvP05SH7bXh/G60/pD9fVb8l62T1vAa29iX5+HCFJpR++m2VLB6GZfdX+DYFcF398bHz5XIO732OF9e9b4vLSbOMAqKfhhYfKVVDzBQcTJ469z+JwGXRkTTcLoYdEXm/IBHYhy3PXKhrd9nH9HU2SX1hETgR1dAlm4no6e6jGUpDWTj9XVwyFbl6fPjDRRR8F67FXb9isdmFvNJcOTy5Jbg9i/MIAw9aUwlAOeDAYDT2jdCw0xdjEQf1HCVpl77OglROEPDChvk6KwtRNkNDATBCDGxlQ+UTC+MrCcpCgYuM/yT4oNBOzLdk53wmQuySA1TVOLs3u9VzyoODgt89hngwJ4FiWyrK6B4Yc9wSXmgxp0bnmXWEhHM5wZyWbyvmaHD7ecwZT9XROtw34Ja4YGRMWvbwLdlh7oJwDg0YdJ1Qv4lO5qR72RIQXi/KT+iuOg0In6EBQeaCATnkBBZDfmmwuhVWLrDwFFaaXBdieLC28L3IrC2Ad4Af643FpQM7wGp1sAxJCUEYvwkGZYb70RODwBthUBybOBFQnRPcSZ1BUpV3bwRp4t/kSAFgU7vXWmxDcI6NKh0feD53BoA3waBGYwcrQyDYxk7JZkOp3bdz+/QiPQkpYoAj+yZN8gkIZgwph6F0iJNQC/4NFapKnbIcBi6JW5IyJEbHN1LVCVLSxJkXPYQEI9UtZ3eKVyauglZKIS7Hvw4Rpg4HZx6s+AQJhTnFHlUnfpBSgFrRcUI8mkzQHUui62flEBw2XLeecjkNLae8ZV7MFVLjrnUnLaAGAg8d254Sx5MZ3gelwBEHuKMLh8J9um1pDG/AioB+Rhw82tckM1Q0NWiJCiYdXPIIpcpT0N+boSeG8tOVazGQC5FAaotNwpMchPL9Wcx64znJUJWNfUguh5/CibWU+ohlVDRkNEOZSkq/UMmOmYQycpo5p/CEJ750q5LwbHNG2nBCuUqDk6TOfKySh8e5puQRnukfkDwqMpvPOJye3fdDBwN2vauCPHHucDY763z9/ZDzZYdQUojOSQb7kMOEsGmVU4Vzn8JXw1ItVX4bpgw6uPMiB1E6DTsgMTAskKPQkMcFZbDcA56VmZSHYn5PgXds5NzyLv3nsKXiIPS0AYUTObWF378JWzpknJNEgnHfBR7WiEWawsMyyMpgMcIAtLKaihBRSSxxlkgCXC5YRQl1HMByXTTGRHl0YJIyzbNTMia4wG4eU5NfzHMEf5SjXIDKgeVcCTzYBOPsz44zjcwaiIrXI5fOhIFzZswKOSC9G+tJpW9IkuLZ9bdg7Wj2uVyUZ7C2Gl+YUADAbU1tVYmQQmbI5VJgqT8JxUcs3nYpNIDD0noSHiWuA0pqx3BWDAOTsOvIpXjizsJp6fLYaGb0qbXMWUj+qFiKTE0yWKrjS4hLYcoP8pzUFTkmTTGlE+LHj5JMSw1MXYoz0qLaFGQ5UKgThtCTGclxnZ6axMcuDHgiZnoy90asNYZzYJMwuVAT55rDcGEMu+CwwIRPIPJtMa+LdmQ4XZGh23uGobyEZbXo4h7uF/Z7pItLCMTKzrEjcGIzZ4t8sJgt7kb3QNPbks1CKo9OTklWXWOCCxU9oxQ50s0Jt3X2aKgTB0V4BuVcuxJ5/uws+8OG83EVBO+G54xohQaeWVoRPEecJqQ5Mq4mkvM4LGm2zLNlzCU7qCpNYPhPneOs/ngLGNla2qZxjsu0Z8I6Mb1C3F05aED4L+4GFy3iUEim9tm9akSKw6gRbblg4UVqz5ScQ06dC+gBhUOn7D6hwkfiOtto4SOXICoSoCuJZlLAaQ7sQqb7XJ6Cz1ehRQW9ixnn4i0T7gxk5rzzGXvlOZczde6c6xkiV8Wmec4p/JItR5eZFDVSOKWNs+hoqrhZty7dzIwZ23PfUuZmk8XDOm+1gGDqxrwjJTaPY0qv4qJaGekQUuCK9p2Kaon2PrehspUPhaCQAkkjzTlNid2VGAqJMhzJykCddCyh4e65igt2cFgXjkUwpPBlPxaFWWKByFLL5KRUqExTJ7HchYTWVi7Uld3JjfG0fNKEZG8q3Uj7XiROt6QQeT93ciNs1P031KJobs3t37ZwaStLi/sD+9SSIEypNjMNMx70Mk0/w+TgEAbFyJcolHloiLiHnexXMC+GyWhHYVNi/QH+YQp8EQz8PlPorqYi2b0zz2CaUwOHuDCbS6d/5rA+914tdOBI4Xl9Oz7vE4XRVF1fXNTvudmHTMKUg/dFY/Vjtej/3XH/dgPnjc7JVbw61X/ROemDMzD5SYs7XWbiqN9ysRROg1fZfU9p8C5AiTRFtVDQc+wQzjgx58In6PJ7TCE57V40THnPjW/0CQk26jLPWkhCGFph0BkngZX3r5nv0ATRhvPl54rXz3dzdr7x6XznSJVqCag4sL1LA13JKyEFxQac2FI7fmzsDFHt7RGU4OPHfGDnOXEE1iYjEwR/pIBALmcQwFXWE8KhFH5PhUu0rG4q72lJAQyO02Kput9cuinUA+3+qIPbB04YGJXtcHeB8Cd4It9rrMcErpAcYteXGjjk8p7T0q2lw85rp7hGOpmHsxYKYTi55FGGy6gJS/OtxloMzhLltThVtOCersWM/zm2cwLc62AyDhdERYcx4xr7dUg26/rgmJRxTxKzCPfKreyxee6P3Ix5J8Xe3LkTGHDg0ZUPNGrAuAEbXWPwTFoYeHZDPEvDc3q6fwybyyI4e4xzfE4a57J8Hb7M23BFn5FSJ9lBOK3FMZnjRIKuT/ePaeRoZ/dvTUm3EjBGRXANvlVRg8a14YsGVJ77HtFGe9aK87QxPbtXAe19yAOco+B7H3jLNo5aC2UF+FcHNlaDf8t+QN8atOLs/JPgLAfnJA9o07Bv9p4kdbPui6hlH7VoQUArgv2R5OQG3dNyOC55v2Xs4fHE4hrMfV406HGAW0p37DmRvQ7oY4PmSjAQ67evmbMLbjmdcyQJSadzdsn0aRHSwXNne/vinEdoAZ1RQeJuXls+SrYuyy8tbStO+aqjbXs7ZoDXcdagzwENUtmg08Cd8MwwX6u5lM6kTZ4Q2EXh2GZ/Q7q1VvmHaQTZ96OaEg+4XE/pYwYoOJiTVX2xN9mb1BW+Zg24MGUBc7VdUPFr2AdNHsLnnJ/CjsvjsT31VP7BfWIfJmgiVlvE9buCmzK+Jh1HRnNt+ZYm2lAxcF3vntdHpXrtc6Jhu7HNeJ9CfqYJo2yzpAQ3bIjhA3UHNSUiki1kLcU+uZDKqKI5S4SKwEcL7tFcnJ3awvsvwIBp6omcRfOnuXepCFJf6LCUjxQLYoLJ17q3jTnZb+3ttwxuxM5a2Vdf+QmuWJ+xwOJ9U15BXkH2H8UNPc+kBbvEplVh9rYxJwuzEO7+/cKfBf3tBFeC8RgWJ/Lg0AezPlASh8EHDCRHm2HBdIcbm5izGJwZg6tiNfGF6P16SGabq0W4atkzLQ7Qsmd8Rhq8uvKFncjm1qVAWU4cLM23juq59fPCbzsN9wTmLk6Ez4QpgKs43EYzWtZ83ZDhCJ858YS1XIMnl6+F8eQ8jMn67GleC4ydP+gUxkLzWmAsQeEULEz0meQhTExBuicFEWMu3aYwF3rbeQmn7TpW1Q+s90RuCXF6TEUZtKDBu5IbAuh+RtHL8LDxQW7+AY1r4M45/AjmfyK7KI07pRmv4QfN/Q9huDHJEjIn9SOewjeg6S/BF/lfjwpU9dlLMcI1zDQhPuWCYVI4gcfzRRzJSqTNVkqbHIbJpWzL58IYmbf0kW7mx2Q9PjN6tf1GdPYb7T4EO27bOFIYJvgez5Vk01O/ZW0sZgddlwTAS5EtoRs8phSTMc8hPaNC7lRYu2MidL7HY7WY3VmZ5pVyxgt49fmMnGHpWnomlsslk5PPiYtMFFz0ky33lSQMcEnwShIGXBxp5hLAw/v+mosTKu9uf8ZeLynZgq383DxHi01xUReRp3uUeNx3smfHNWqhoHaUxz+2WOaHPjGHLJyaEIfjZmxnmNlv+PvcoAutyAXHp25sAZHIz5laPLhkNns/cnpnq8V36Jog8do4XujK7AXPRy3I/nrZn8QuqYVabwxcMTNfaGLCSQOCW/a+KUYhxaVO9/TcNcAlopgELBQ4+yixqa54x4G9MU4f842f2Mvq9VUqdoM6rngQKDZvobHJooNMCi4fOuEiefiOi5wJvoNjd8SLsBNYdynmg86U0XfpuxxHcjVzSe6SKCYl7tkzpePFzsvh5si0XIuRoe1Bksr2ui6Bgx3Pxn6ctB/LyLvDe0rns/JFvEaukO9KE0JU/2ycNS6+SPvL3jBJEJE4UIcP2f4EH1jX9XHRl1rmn+SLHnmWXCGEEdtZqcETNcnQwpg9LgSH8ZWSxHdBcZhaqJkS7KTsfOSKW/GYUng1PUrxUpl7Lk2S3FrrM7jZuO/f1QQXgQkmsKickPhEdf8u6EFmHjhnlySYrDkp8cDruZNiLkovIzd2VtkY88jsWXOOrkioez6rTuao9/2YH3I7D4lsFBsAFdLze+eKLDAOWbpwigdt17aQdACzJu1g+5uhL7Gdh8T890b9gerzr9nvFlpk8NzOcaYRsG/jWWf2m+MzXrnfdp9euPbvaoEx9bg394Rx9YX9pgJ3xnY+t7hUUTFaLWoVFK01Z5PbKshzn7g4mTQMldgMpl+lFoD7sfPkEgsVhzwdKhprNe9KsQ5Lg0pMyE19joTF8Va55ZWwvdACctqoz9OaU7nlBMcbczTn8B+do5lXA54cDyT4zRG4egZ3jTO4D3nNK8+68Bqe3zwO15NZ2aM5P+U1Frdjc/4MHmphle/jodDeJh7WIR6u/gIeDnyxH9K7Bx0Xp3SRmoJdE2p/AnLeUVquGb6YGr54u7NnL6RHmd33xO7Da+TrVW35Y+u7Ad9s0Lud3Ysfn1fzzEwKS6/t82fmGL04xzp1Tan+y+dIOPZ37m9IE1KDx5Y3pa3yx9+w1y30Uc9a6xyTH9BRGnJCEcqhxPfIZir+LH/epKiyFmtKXFOQQCa9FRuJnuci4HuvwIH6FAdcFJ3Tzc7IM2dl2Qb/RRh43vf2OZ7FU6KhnjefyoZNvcDwhNM5Mu9jHffvmOOr4fiSvto6R+HP/xwcX5SxXfTjUSLYAhmUChehv2/mmqYeTHMpiZAWHzQV7B5wZCZFgArcpl73M1HdGkFX26huV2QLZRR6b+54H/zN4+kYWLCXmkhpUTH4JsektHx70vh2LoW2BJ5YfEwiCZF2jaZKmzASXaMxXSPjHReSE5vbvV/36OI13+bIwdZ1b1677okrGvIPr7tyOCz7jfZmhz84turKwfrYDmDnIjECr1ov529zxDNHQUr0s4uCnEhjiaijOeBYtIUKonHxmD0X02IbGTc79lkLEq0qhcyGaCeVghVbec/ZR+y3zPjv0Z6PDSCYP9xjFLVrHCxR1FKohHwRc80aMC3rJoX91rpsni3hQ9jUtM8FAV2D4ep0vzmrjW1ZWKBfW9r4vVK4Cz+QKGNzpqqczzHzNL/XL39T7IHyvMdJxS/O2nTnYF3SWXLtjcN12qwPQ3+DcYRuumavqxe+STQuGrni1+vyyuF8Yc6RwsTJ9Q04zQWmhZwZuvdM9vMT+I/iEzr1AzBdVS98h+2Zicm9ML5A5/vvUiT3TG3Rts0h47I01RA8ZF5r7fpXyShe1F2sCfK3lFZJfnllaZW4rbRK/B8qrfLb90ur3Dys08fH3QH+Wt0tn542KwDI7f4evtPvwOXNcbP/Qyqf4HVu7veP5od+JX887R932xtTciWif9wv1wKOGF98WE83NU6lk9ADy8e93Ihhc96tnh+/YRkW+uTZbXraPT+ubl6AgywbRi9u9t8vRXOzLm5e3HSzo73odEP13uPN3XK/+XYTTLZtk+ULv+82sDJfrue3Bk794nFKR+Gly4seW07G6nXi747F4DkZC9BjWZnHvuIDT+en3WtMO5GqQx6ReUSP1g6yr8L0f/0runq+GH390pnMstmiuv1Y5a1FhH6+g/149wUuCry42H2taFOenu9w/tF+B/+5+H2uT8KH3cMn5wTowD48GUspHLQCdLx5bKkodL9Zr/H1d/DJTb38QkPhORAIwri9dz/1+q+rV/Tn7kGPRqcnf79f3m/uEMyfbx7Xy4dl6yF5kTI0CVwcrXYPDzervUwX7kUvEr5/Rf+Ou3GIXP+Kf/lrB0Af2f3559PNvoE9fwu+9L6PL7PH5eYBnsl265u7/wIcWT7vd0+CAH8FH97M236JOuGBjn5t5W2dFlIYR3+dtbVuoH7MsjIg21P5c/e4v90Vu4fl3cDffUeHy/ET/8zVDot/0c3yZr+vBK4I8XZuqNfIDaN/917kh8HGfLi5+3aDGNDYwc4PscdXccRW8P38Sk73F1lY8nPIC+DGa9nO33XSO4rvp0d9vfnmz3Lj9H+6Wa7hLSryBnN9WLdTAHevZayXhl9+/XqH8N0/Lh+e/tw93j+5Rx5bRv/uF/9nuNWLh/1vYVed+LeQWyX/7czq5++L8f8TFRL/OKmQuB9jjCYWmp0NsFIi5kT2xtNhsY7vtuvLwr7X/XJ9fF7V0Wb54VO06u++XSXrZF31kqzqfVvdr75lWM+DS2o2qyCCfr41eRSTmOwmkmOVcRMdjnlLcsyTkWoMaypOP3LF3NctdUm20eLy82Z8Gq/ylm9yUWBqWvmab36+W/SzXss3q4waLGItshxtNxHllPyRY+OhWptocYypy1m0uTk9n0GPRcbnUpPP3Eff/wyz8CdcnBhj6+rCFYxvySC/y+7nh8Vs2NZUXRuj9k7hgzGFqVY0asKnN6J6EGj7bW3/XOb1osxbasVwEW8uuN8GI4pbnH1UGLGNgnzSLj/HwCXycNmY+9eFjaeN8irqhLlvW9OW2+fghffxmuseog3QzK0FH9a3o3v4dkvjdSrG7OrrBTBmH7JkUUssr9SZWO1tzteYbIyuMoJrz+3vf96FMeUUJ25z5yxeeViG9z381LYvc2vJtk5yrCRSb9tiOLumrg9Wk3jWemFYKyO7cHZQir/XXEq0K9t1mlykfXP9smZq0oI1BCWmOFjzmfdPYKnwy6h+mdhrr7MAX6g57Uwbfbj8zyq8b/ClDOZVmHnZdZ2Zi51jSx2meJCMrz/dttCempv9cIWJERbfrieu8e0YG2i45uE52nYjbqYCz5K/iOM8MU+U/Y5bjmmmoujzI1W1mEZdalJDBdM5Xjx8147b/K0x7kU41ggbbnAMZRQ+O2zOwY4Le4B5/BNtxkC5fPY7ZtxO87dg3JbacXD+MI+htSYLVXfq+FYPKxe527b73HJu8tbdF4+btM+OCSsTibILsPKKMyYP7Hmw9wMqFqF1WeovHPj0aTa3e78yVPBo37f3OVonmNcPnBYeq4W6AHUq6nEbxyqphZVGDGC9SlePirIK8AS4eou51iKpqRQ/Z3/uscWtrzSWu/YGqyoKn6P3OWIDKFfsy/rb5xaSFcfthaW9vK/C5jDPzVOqv7kWHr792ZRaqvs2Ixj5W2o7EmozXktNrhrb1kgNPmklkElNroFtZSqZvqnWiElsgXg8fVzvpyi4Bg1nKnLkhG9PLR7dLtX84FZ5FWercyYgtxuUNsVcG1O8vi2SU7y4X8xuy/yUU1YcJaF1ZSgbVWqbUAR37drgbFJTxQkjJlydk9h7haOI2xtyFhLsl2sZhW0dRKpCj2DHt1uIXOs8yV7oSn1SzGjhFhP/hfvVIvHdL+4zWGNbxeDW8+OrBNP5WWmdJoDnJNLsdW5noS1Uctc2A/Yqtu1cTIYJ0RitcXNFWfJUi2nP9RoJx/au1hJyItcujtqsJS7rHdsY1q7NDFYt5IzFTYq1sWpplbPntjAkxdTanlZwIGHvr2vVg/CUdmJRyxjadmpo5x9zS6QJeX2vpkEtqbb1ULtFof3c0nXj21Wd0ie57+hTG/df3Oc10NCWmp2A1z3N/iDu32e6uNTacfTbR8molgyQuLC/laYmFldO2DiJFCOfvESJGYTsWccaY7GpjXuQulcVexFXRsIzz2F1BzO2He9tGgxqcS5zDNv8uIgT22KHK03MY5c1bH7Lqf6wq4N2YLx38/Se9U0w572ZM2WbmZp8Flb6nFTW9evU77RX/X5pzVT1W+us2TVTBRBtZav7zjSD2/05vndBkXecsYwRFtIuhjIyufINtglKuA0btaU/Ks3N64GNTOGoW6kK4t8ZogQulWuwBqTQzxYpK4ddGd0D1rZIWUjdOZcmwxqhlIMkuX92dzfUdExzrIKdz2tb2TJtYO7KSCd21y3mYz4BV8rjvHeDEeFz+7OnomXVi9nHu+yyvd5fhtaH2NW3hb0BOsy89jI4r3a/q8Y5L6V+pq58H+LeylbyOXMuKZPCng2z8sZzLXj9QysPpWq78g95sMdajZOrElLTwsTFCVEsHEnZiKHaTHDfipF/SE1XrjWFTUo1FmYvzTsraSC6N1IASr/MGalZFp+ellMM2J3F8G/LKaY840hiuU70tRE21JppfuzcNtk+ko1JmlNS3lfVPUq+EubV1iqNIq5S3eLa2QHkXa1abcdt/tYY9yIca8SN4GvO45ZnSVKc6By48W7jm0NqSj6vPbcIv2PHbf4WjNtS3TSP399n14ttK2YduFIMyVMoP2E7SK6jTq2BeVZC5zvjqcnADSEaQL8xQ8QwX4WFzg5V/+xSfVzXThHlkK225MRMPInazNEiydSOItfmakU5slwmrSTLzMlCGJmDMoZW2GJ64CJS4zFVNaV2ifvRzGEYzYEyv1kTlvq0rrIYnTSpv0mWFMk43VNtca582vWRaZFUhjlZVyeE69+72+PrT3ejeNHON2qSvKje6rZlt6lhWy05/hXXxefKpyNq+J5L0053HdxHeqFnlWJq7W/UrJil+yukhuVEmlX6a61vK9UaK5b6V9o4scO2Z24A56+D+zXRu9rVvbG/mfUURfsa2up7320Xs/V9i82WNTOxDVLe50a1Gal/Vbm4ROLLGrMG2n/l18/XtLtVGlEMmUjf/L6rdGx/42ajFMuWUwyv2xt/TblkfoxhYebQ0++KD+BkPqKd1z6+jXKE7FxlDhT3V8h3iRrY8VqsGIfsMqsWZdFC+3PX+2XYJ54Xs+b7HsZK3W9cJ2HobNLSz0TriWGNiMRx4BJPt0qjqH2uJL4PJc/c5Yzn9dzIPGlxxuZ6xuaMkuCQ4lrF8nNqRdLaeGds6fb+kqTQXBtbk4Tia2rgGcHYRLZpU/XRmquTwnc6Jj6YfRNCgbHmlObZcN0t5bGN51CjnLnaEEiplcJHPg6U8jqeJW86oVoQG4dnKHN0pPIyws41lSTNVWRCGx882ujzKxyHc+yoGXKq+SEx5XvPFHepZrTUqMy9ZWuq9VWo0XMlzUBp/5gm0Nw0t3LvtWrUTkWjxx5EqOmWypepc4SL1yZKzJyj4Hpo3Px85DkKSfhZKdzF3Mf6eFwDu8VXEs+rxezdXbZp0WBrqoUm8dNZ5Ks330q+ncs7ERqBXHj0gh8hN36ALLhv/QhoT1ZccPb6mavd4LTedt9Lbu6/340wB09yzM1Zq3/srKGfb8V+SDprxbPQxQTt7OLDoY4crnEw9YAaShPngecrSfAb5QMJ7tbBc1Vqxhu1WyCuJ50WPlFTPHWtDUp1/7bU2HeMlkSRPjyMPd6+zSpOVc01p6ITWh8aVvHyRb+PgzFJV0rPao2BRusP1beS2kiuGjVavOQbVurBZusq27LVkM41Ww1Vzq58I3vSK01zdns/d3kenLu5YmsiaWFSO0b3qlaroJc9Wq2C5d0GePT3fHYHyoHHauKSX5BX6Bt0XWWkP4b2i8P55JIvTnUItZeeeEXafWJYj0ItY0FFbqpN5TpJoGWddCu0LMNzDB/2R9daA5Cbgrv50XxESqX5hF6alVi2aQ3qU6+Q72qNH2xULpqCVDj366B8qtL1EzBwiMy33quVUhvcdw1eOP4Urg+1BZfbQ3UrpJI880U6K5Rjl4ydJrPQXH+xEkfNprl714j1j6zZQFUbtGKzXDifQ8fHlxcS4+8sCWilZpmO6+qivLRythKqal5qLcdM5ZCE5apV1+p6OI6puxe73hD+vTh4ryL5UvgpWvVQ/lKr3gAbJAu+faa6LL6RMMKZawFz7RrdP39t77fgvBmL1uzHoK4DnFfDFdiFL7tr3KdgbsG8uf6Th2e43ojhopY6A88A7lLZ3o8TWXjafYjD/YoCeEpOFGudD9RjqAryWA0eUB0sVystbcyN6mKpDcZ8Y9XACamnxeM03rNzy/dn104WXIMHG+KB0r3ufclNwXXvWveqOLNvzTgAPw7X6fI4ENB8Rwv9NdAoM6cQzlqrzMOyASOCSay1yg0sG+dE6qjN2OsUvpeeey88l3GwxzHLL9RhjjyqvtHz5KVm2zXTGUdbYv4tItpC1ga0o0kzdY5HcV3+zvGPfUh3Da2l+pmUD82dBoBGjKn2lHQWwJytvtY6LAwOZUY3sPfddYy1weSZ4D56NdqeX/aD8yNdd7V+pv0N5zzEHgRirUcLB541zj9bEi+QfLsH4m+Vs0m207XoDF2LG3RN6rLhvt2SF0CsV4x3ricCea6MLCK8kWuHObhTrzLOmYPvvEO6hnIOe2qxfqjvlUPrR12Fz+m6NGN6uUp5F8lLGef2bRTncjM/jDMbsKesL7YC9vbTPlCepvk2ewzZs7pGb0Y55DlyX1Dfjt3ThzM0wdIKtJtQrl8teaPBN0emlqR+k+vXZZhzqLW/Xccbmod6J72ntzJyCeXvyjPdnOQL9qBi7TDeK9eIHXU+ztN0eq3HA5AHE1oHygZYH9ZFSvjYMaeHTwO7r60d53DP1qqz31mznq24uyPbkeRYnsDkr+wDem0ptzkTG8MQ90J6L30sLQ2wZxflHy9/2fuGBlDNJLEbkKVTeW7UNXJJ90V+VDlfBepQ6Hn3sXZUD087r7Es7Oh05a3U9r6/XtSGjiVn6FJwvyHPxdLHWTq9fEVbiK9TxzKzzH1Uco3WibFoOznCwCi476+TrP2ZTdr+/H3Ii6hnongzz9aMZNuuxobWTC9I5yy1joLYy7DuLdWjEn1Qa8xSDVjpu4uyYtfUkcCzzjhF55Lq00m9+SF5eYUWkb1F75McKb3TKIJg5nqjPYu9pMO+x1Q6R2Uuj5p5uOtrjbFt6iOqMufdY1vZSLwLw/7Enyu2Z0c+EmDuuktxDfaJ+lPRO1BpJMyQ/u/sYwXWARc9OGn+xvJPLv4dqqHeM108sf4v92Tsu2e99wTt46Xznthx9xwrauVE+51g3OZvjXFTtu+5vGayB4uHm2p5Mnyxhr/vCbQfUWcrop0x7xvXcMsqB6ej6WeSGJ/w0UfxEL/tOM9KpREgVJ9TammQLubqq2ZBL5rUxUwyf3C1Vnumvy7WBDFyMsItlXpQuD6Xq41xy5X2nEAbDOi5FOVHNW7IBroVvJvQOVS7AvEpHhP18CPBwPWgQH61FTs64u5AavvkPlpmZmunU98QrgNHthNna0AbtvpnueeAj6ThLnR9hivMD+OWJQIvjUbO6yXXHLVXUA0siVumNVIEosKWxkOZMZLxxOMVjC01m2WOUj9PfBFa03XP8fxzqhWZsXcQxpx3vA5vfRcAextZMcPOmZJ7UKFn3ful2evlOmZi/bXEdRaeRjFFnAmejdBXUDo/cJQFdvDJwZ07oPEjsm9oF2mgaa7OM8uXKHNJ9J3oJqnI8ci3FDaCT6Lj0bWJlvR6SCo4SZGVieipOm/z3so+F0uttMjVN99oXdWC+u74GrgrxTnpGigxIlSTUmtnOK9lQTI31UHIbC1v9VnZDsEHY1s7cL1VqdNB8ql0Ptzw2sXuU5vOnrGz4W2odod25TyY+3iWWA7A/jR43tluLn4bsV0l6vFs8W6S50esnCfeTY6J1H54VEk8EokQsGD77KyuZ665OtVcYolT+xt7mcQyBqemd+W4mb3WClc6BnmM1DoXjV3c3dlrqnzlJNUL+5uuh61G7Wtw3SBEosykG8SgZ7qQd7j6LnpzJ359/trc/1zLtXj93LtFeB+lOqWK/AxXOEprOuE8f7mecHX81u/N2VIfPN+4/uM8dgziUSCLNLFjojJ3ZfR1rhMV2Azdc0etYSi2ww5HMXvboTvbl1qDTXmoe77nbQVzsR3Y57jemp2PsR+cq0d8JJut7yeN+o3U5aH8IaNbpjbK1syB5hRZO5981z/Pdelo/SDXK12MXL1a1VO9bcTbXBWeXkfTepViS8FIkcnezeWlXSWvu+fAmGkhsRhcXVu1x2AFdIbetALpCtC6golmbrywgtyOX/j3hi9Zj17eYddVaYDWE7YQoBaDnUgoRueTs4Kzpc7sXtMKPo2i0KpLczCwihx2rDd2/FNsEkmsFZva9qKJTec1GtSSfUeREWnJ7HEILXL5SzDdjXwV8Vo8GqItqEdDtfcTj4Zq+w2PRtPz78bsmTFqsdSppcd6YPbmuy3e/7mr7OgkiJlGmM2fXU9RXIvkbEiMunB8toB7KSbVeP7wuSlV2/Nd4l1VrWBsqqJtclw4lp1gjZ7BTK1LXZYWXdxWl7REitpQ7+rceUXJUuIj93q2d7mPGycJKZZoOuYFfPYqocpkDZLIhA5X5Eevp60+mMo8qeO1aJORy5X5gl20nOZVcO5C31XyQt6lXjdfxY28gC6nAbWFjkjI9j5XXCdp564lmiU3XRdRKuQKbGPMRbgw8aS1y+PRa7G2okVeMkavs1dTblf5UKIYzlNrzlI038C4bq0MV0hFeZX8Yt+5KLh/9JmcWEG8QOlP+95iFTvxFnT5GyjdTo3Ui3StlK4rznq6eCL5wPXVRe2WKy3m5LEobBVVjOio1XPmosRmmYnionhuV1mOI0SkwrbrzHZHmoGPfiIaE/F3J5SnIHNGqwnOIZK+xB2ufqpe4MzlUfGeT7SDXk2dE5m2kUUS1idxjXOqdqpeFbJg96VzgouNvitDS6WxnDasic4D7CyIi5hlWbbkEm66sYp9w7uj9NBcN6y0ltZW53kMd6/yPOYcD8BoYJ87lkWGDrd6fN/K68zzDV732fE68Xr9EK9ryh1n11mSVqc6xIE6BmmF77PyxrwhbzCPCHnj/AXeOA+fk3ma8QvvNceYV/FYu+r/al1vetKjV/D2SWIyb1Ev853tSDZza9kHlv0fls3+SVi9oLHGARWtMdJZMrioj5PXol6MNdmYWJPK+grzZqxJ4jCYeuzYeA6SVKTOsxn7Ij03XrTs55H23oRZ90wU9KERA+JjTzbpOV8m1rTuYtyO9K/GjDmOE2EJJvJ9MTPtWVqz/3uoMcJV5v2p4W8cj6EacjAG+33luQT9kZmPI5umsbejrUViEvvqZYEcrcs26o9P4wut/UCZb+JTWscsca1IIpFeh2xvwdqZM+frqdTvKLB21Bb7gvq9NtcfvpIfTO0/bHkQm1T8HSlgGmg/1djFdo6Eks7V3lO7mCuS4hw8zbW5n2T+mqgkWwTI91Wy7d1fjzT+jWx+b+A2Nq7A1/8oXRx3zLY19Z8QPvn+elOnMeKJ7UqmJ8L+yBl62z3FKBCnWT+JvzqSeCSp8zkXPxDWD3B+Rst91K5budhkyojWPtHmPtXnvYsl65Y1HJmz8wO2+aBtXIXtZXVd2DjQc1pkTdJ4qT5vkJgdni/KIL4hoG5zjp8POcFB6muc4wTxC3aUqmFHOYnBsuOLfUTe83aXph3lhV5qB5OV3sMauZzV/TGUIC6ipmTSLkFsXpZkvASxCCWIQLt+QYK4aJEgpq/QltHv03fxEFGYmX8qybzVBvSCBaXTzqV/xAY0f5UNKLORpgBtR1GivA6sdU1rWieIxpmqpb8dE1qjB6dRIOt9FxPc+IGMeH4HXrZ8XXQ7EvdQYI8gk/dnz8nRnKuoeU6WVLFgUEnt6Jf3e9qmOX5vjymOwn5jH1hqXr/nXEELrv6e6pJxs8ht1F44uXNaXNLd/NurS/76/Yprry2cHJSK/H9TOBk257FyRZzxj9z+4WdDf+l0XlVc8qUyyt8ttxy/sgjlP1NuudeoYtv57Zd//9Lpxr/2+L8//xKO+NrSy79EjRqYUWNq/6G6y/9E2eW2AuPtZZelkCbVXL78n6+5/CJR+d+ruQx/Pu52e/v44/LrLVdOTgb/Fw==&lt;/diagram&gt;&lt;/mxfile&gt;&quot;}"></div>
+<script type="application/javascript" src="https://www.draw.io/js/viewer.min.js"></script>
+<p>A typical deep learning data pipeline<sup><a href="#1">1</a></sup> goes something as follows:</p>
+<ol>
+<li>Read data from the disk.</li>
+<li>Apply pre-processing on it.</li>
+<li>Copy the data to GPU.</li>
+<li>Perform the forward and backward passes of backpropogation.</li>
+<li>Copy the results back to CPU memory.</li>
+</ol>
+<p>These steps are repeated till the network converges.
+Hardware bottlenecks are most likely during steps 1 and 2.</p>
+<h2 id="the-tools-of-the-trade">The tools of the trade</h2>
+<p>My favorite tool for monitoring a linux system is <a href="https://nicolargo.github.io/glances/">glances</a>. The best feature of
+glances are <a href="https://glances.readthedocs.io/en/latest/aoa/events.html">events</a> which tell you if any single resource is being
+over-utilized. Regularly running the <code>glances</code> command in the background while training is a good sanity check to ensure things
+are running smoothly.</p>
+<p>The other tool you should familiarize yourself with is <code>nvidia-smi</code>, which provides data about all the
+gpu&rsquo;s connected to your system. It has a lot of configuration options, the most useful of which is probably <code>dmon</code>, which gives
+per tick info about the gpu.</p>
+<figure>
+    <img src="/img/events.png"
+         alt="Event Image"/> <figcaption>
+            <p>High CPU Usage Event in glances</p>
+        </figcaption>
+</figure>
+
+<h2 id="finding-bottlenecks">Finding bottlenecks</h2>
+<p>If your GPU is spending too many cycles doing nothing, or if you notice a significant delay between loading 2 consecutive
+batches to the GPU this could indicate a bottleneck. One way of finding bottlenecks is to periodically run <code>glances</code> in
+the background and ensure that the training process is not raising any <code>HIGH CPU USER</code> or <code>HIGH CPU IO WAITING</code> events.</p>
+<p>Another check is to ensure that running the <code>nvidia-smi dmon</code> command does not show too many consecutive ticks where the gpu usage is
+completely zero.</p>
+<h2 id="solving-bottlenecks">Solving bottlenecks</h2>
+<h3 id="cpu-bottlenecks">CPU bottlenecks</h3>
+<p>CPU bottlenecks are usually caused due to performing too many computations on the fly before the data is copied to the GPU&rsquo;s
+VRAM. If you are performing augmentations on your image data (for example random crops and flips), this process may cause a
+delay before the data is finally copied to the GPU. Fixing this may require either using simpler augments or if that doesn&rsquo;t
+help, in the worst case, you just might have to perform all the augmentations and dump them to disk first, before you start training.</p>
+<p>Preprocessing data usually provides a huge boost in CPU processing times. If you want to fine tune multiple CNN&rsquo;s on thousands
+of videos, dumping the raw frames to disk beforehand is definitely a worthy one-time investment to make.</p>
+<h3 id="storage-bottlenecks">Storage bottlenecks</h3>
+<p>Storage bottlenecks are caused by performing operations synchronously or using a slow spinning disk. Most modern frameworks
+provide constructs(<code>dataloaders</code> in pytorch and <code>Dataset.prefetch</code> in tensorflow<sup><a href="#2">2</a></sup>) which help pass data asynchronously to the GPU while the current batch is training, helping improve performance significantly. Using multiple processes speeds up this process even more,
+though eventually you will hit a point of diminishing returns.</p>
+<figure>
+    <img src="/img/prefetched.svg"
+         alt="Prefetch Image"/> <figcaption>
+            <p>while the training step is running for batch n, the pipeline is reading the data for the batch n+1</p>
+        </figcaption>
+</figure>
+
+<p>Copying data to an SSD also helps a lot if your data is scattered in lots of small files and require special logic to
+read(like <a href="http://vision.middlebury.edu/flow/code/flow-code/README.txt">.flo</a> files)</p>
+<p>Data formats used to store files also affect file reading speed, the best file formats being those which store data in an
+uncompressed format. This uses a lot of space, but helps speed up data loading significantly when you have hundreds of
+gigabytes of data. The best file formats for fast reading of audio are <code>wav</code> and for images are <code>bmp</code> or <code>png</code> (with compression
+level 0).</p>
+<p>For generic numpy arrays, although the <code>npy</code> and <code>npz</code> files exist, I have found that reading them is usually slow. In such
+cases using a database may be necessary. The best database in practice is probably
+<a href="https://en.wikipedia.org/wiki/Hierarchical_Data_Format">HDF5</a>. There might be better databases out there, but for all my
+projects I have always achieved 100% GPU utilization with HDF5, so I haven&rsquo;t found the need to find a more efficient one. HDF5
+lets you store arbitrary shaped numpy arrays. Also, there are <a href="https://www.h5py.org/">python bindings</a> for hdf5 which make it
+convenient to use, although I have found the documentation to be somewhat lacking.</p>
+<h3 id="gpu-bottlenecks">GPU bottlenecks</h3>
+<p>Since the GPU is usually the most expensive component, the entire training process is largely a process of optimizing the GPU
+usage. The only GPU bottleneck in this case is when you cannot use a large enough batch size to make meaningful passes with
+<a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent">SGD</a>. Large batch sizes usually provide some regularization and in practice I have found them to generalize better.
+Sadly the only way to address this is to buy more GPU&rsquo;s or reduce your input dimensions which may not always be possible.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Putting a little thought into optimizing the data flow across your pipeline can help you gain significant performance
+improvements without spending too much effort.</p>
+<p>In another post I&rsquo;ll describe how I use hdf5 to improve data loading performance in typical image based CNN architectures.</p>
+<hr>
+<p><a name="1"></a></p>
+<ol>
+<li>Icons made by <a href="https://www.flaticon.com/authors/freepik">Freepik</a> from <a href="https://www.flaticon.com/">www.flaticon.com</a>.
+<a name="2"></a></li>
+<li>Image from Tensorflow Dataset <a href="https://www.tensorflow.org/guide/data_performance#prefetching">documentation</a>.</li>
+</ol>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/about">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-data-pipeline">The data pipeline</a></li>
+    <li><a href="#the-tools-of-the-trade">The tools of the trade</a></li>
+    <li><a href="#finding-bottlenecks">Finding bottlenecks</a></li>
+    <li><a href="#solving-bottlenecks">Solving bottlenecks</a>
+      <ul>
+        <li><a href="#cpu-bottlenecks">CPU bottlenecks</a></li>
+        <li><a href="#storage-bottlenecks">Storage bottlenecks</a></li>
+        <li><a href="#gpu-bottlenecks">GPU bottlenecks</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&text=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&is_video=false&description=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Hardware%20Bottlenecks%20and%20Neural%20Networks&body=Check out this article: https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&title=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&name=Hardware%20Bottlenecks%20and%20Neural%20Networks&description=Training%20deep%20neural%20networks%20takes%20a%20long%20time.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fsanket.tech%2fposts%2fbottlenecks-nn%2f&t=Hardware%20Bottlenecks%20and%20Neural%20Networks">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Sanket Shanbhag 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>
