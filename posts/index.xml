@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Sanket Shanbhag</copyright>
-    <lastBuildDate>Sun, 02 Feb 2020 16:35:47 +0530</lastBuildDate><atom:link href="https://sanket.tech/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 02 Mar 2021 13:25:12 +0530</lastBuildDate><atom:link href="https://sanket.tech/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Notes on Inflation</title>
+      <link>https://sanket.tech/posts/inflation/</link>
+      <pubDate>Tue, 02 Mar 2021 13:25:12 +0530</pubDate>
+      
+      <guid>https://sanket.tech/posts/inflation/</guid>
+      <description>This post is a largely a collection of quotes and some personal notes I took after reading Michael Burry&amp;rsquo;s (now deleted) tweets on &amp;ldquo;the impending inflation crisis&amp;rdquo; about to hit the world.</description>
+    </item>
+    
     <item>
       <title>Hardware Bottlenecks and Neural Networks</title>
       <link>https://sanket.tech/posts/bottlenecks-nn/</link>
